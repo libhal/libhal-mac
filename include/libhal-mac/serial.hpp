@@ -22,11 +22,12 @@
 #include <vector>
 
 #include <libhal/error.hpp>
+#include <libhal/output_pin.hpp>
 #include <libhal/pointers.hpp>
 #include <libhal/serial.hpp>
 #include <libhal/units.hpp>
 
-namespace hal::mac {
+namespace hal::mac::inline v1 {
 /**
  * @brief Darwin (macOS) implementation of the serial interface
  *
@@ -64,7 +65,9 @@ namespace hal::mac {
  * // Process new data between old_cursor and new_cursor
  * ```
  */
-class serial : public hal::v5::serial
+class serial
+  : public hal::v5::serial
+  , public hal::v5::enable_strong_from_this<serial>
 {
 public:
   /**
@@ -80,7 +83,7 @@ public:
    * @throws hal::operation_not_permitted if the device cannot be opened
    */
   [[nodiscard]] static hal::v5::strong_ptr<serial> create(
-    std::pmr::polymorphic_allocator<hal::byte> p_allocator,
+    std::pmr::polymorphic_allocator<> p_allocator,
     std::string_view p_device_path,
     usize p_buffer_size,
     hal::v5::serial::settings const& p_settings = {});
@@ -88,7 +91,8 @@ public:
   /**
    * @brief Public constructor - but use create() instead
    */
-  serial(std::pmr::polymorphic_allocator<hal::byte> p_allocator,
+  serial(hal::v5::strong_ptr_only_token,
+         std::pmr::polymorphic_allocator<> p_allocator,
          std::string_view p_device_path,
          usize p_buffer_size,
          hal::v5::serial::settings const& p_settings);
@@ -107,7 +111,12 @@ public:
   /**
    * @brief Set the DTR (Data Terminal Ready) signal state
    *
+<<<<<<< HEAD
    * @param p_state true to assert DTR (set high), false to deassert (set low)
+=======
+   * @param p_state true to assert DTR (set high), false to de-assert (set
+low)
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
    * @throws hal::operation_not_permitted if the operation fails
    */
   void set_dtr(bool p_state);
@@ -115,7 +124,12 @@ public:
   /**
    * @brief Set the RTS (Request To Send) signal state
    *
+<<<<<<< HEAD
    * @param p_state true to assert RTS (set high), false to deassert (set low)
+=======
+   * @param p_state true to assert RTS (set high), false to de-assert (set
+low)
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
    * @throws hal::operation_not_permitted if the operation fails
    */
   void set_rts(bool p_state);
@@ -146,20 +160,6 @@ public:
   void set_control_signals(bool p_dtr_state, bool p_rts_state);
 
 private:
-  template<typename T>
-  friend class hal::v5::strong_ptr;
-
-  template<class T, typename... Args>
-  friend hal::v5::strong_ptr<T> make_strong_ptr(
-    std::pmr::polymorphic_allocator<byte> p_alloc,
-    Args&&... args);
-
-  template<typename T>
-  friend class hal::v5::weak_ptr;
-
-  template<typename T>
-  friend class hal::v5::optional_ptr;
-
   /**
    * @brief Background thread function for reading data
    */
@@ -176,7 +176,6 @@ private:
   std::span<hal::byte const> driver_receive_buffer() override;
   usize driver_cursor() override;
 
-  std::pmr::polymorphic_allocator<hal::byte> m_allocator;
   std::pmr::vector<hal::byte> m_receive_buffer;
   int m_fd = -1;
   std::atomic<usize> m_receive_cursor{ 0 };
@@ -184,4 +183,24 @@ private:
   std::thread m_receive_thread;
 };
 
-}  // namespace hal::mac
+enum class modem_out
+{
+  dtr,
+  rts,
+};
+
+enum class modem_in
+{
+  dsr,
+  cts,
+};
+
+hal::v5::strong_ptr<hal::output_pin> acquire_output_pin(
+  std::pmr::polymorphic_allocator<> p_allocator,
+  hal::v5::strong_ptr<serial> p_manager,
+  modem_out p_pin);
+}  // namespace hal::mac::inline v1
+
+namespace hal {
+using hal::mac::v1::acquire_output_pin;
+}

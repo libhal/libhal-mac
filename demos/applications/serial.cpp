@@ -1,15 +1,26 @@
+<<<<<<< HEAD
 #include <libhal/error.hpp>
 #include <thread>
 #include <unistd.h>
 
+=======
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 #include <memory_resource>
 #include <print>
 #include <span>
 #include <string_view>
+<<<<<<< HEAD
+=======
+#include <thread>
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 
 #include <libhal-mac/serial.hpp>
 #include <libhal-util/as_bytes.hpp>
 #include <libhal-util/serial.hpp>
+<<<<<<< HEAD
+=======
+#include <libhal/error.hpp>
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 
 void application()
 {
@@ -18,6 +29,10 @@ void application()
   std::println("Running hal::mac::serial application...");
   constexpr auto usb_serial_path = "/dev/tty.usbserial-59760081941";
   hal::v5::optional_ptr<hal::mac::serial> serial;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
   try {
     serial = hal::mac::serial::create(std::pmr::new_delete_resource(),
                                       usb_serial_path,
@@ -26,19 +41,25 @@ void application()
 
   } catch (hal::no_such_device const&) {
     std::println("The usb serial path {} was not found!", usb_serial_path);
+    std::terminate();
   }
 
-  // USB serial devices reset sequence:
+  auto dtr = hal::acquire_output_pin(
+    std::pmr::new_delete_resource(), serial, hal::mac::modem_out::dtr);
+  auto rts = hal::acquire_output_pin(
+    std::pmr::new_delete_resource(), serial, hal::mac::modem_out::rts);
 
+  // USB serial devices reset sequence:
   // Assert DTR and RTS
-  serial->set_control_signals(true, true);
-  std::this_thread::sleep_for(10ms);
+  dtr->level(true);
+  rts->level(true);
+  std::this_thread::sleep_for(500ms);
   // De-activate RTS (boot) line
-  serial->set_rts(false);
-  std::this_thread::sleep_for(10ms);
+  rts->level(false);
+  std::this_thread::sleep_for(500ms);
   // De-activate DTR (reset) line to reset device
-  serial->set_dtr(false);
-  std::this_thread::sleep_for(10ms);
+  dtr->level(false);
+  std::this_thread::sleep_for(500ms);
 
   auto const received_buffer = serial->receive_buffer();
   auto previous_cursor = serial->receive_cursor();

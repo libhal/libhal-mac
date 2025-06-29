@@ -24,7 +24,7 @@ libhal_test_and_make_library(
 
   TEST_SOURCES
   tests/main.test.cpp
-
+  tests/serial.test.cpp
   PACKAGES
   libhal
   libhal-util

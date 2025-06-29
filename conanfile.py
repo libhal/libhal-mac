@@ -35,7 +35,7 @@ class libhal_mac_conan(ConanFile):
 
     def requirements(self):
         # Replace with appropriate processor library
-        self.requires("libhal/[^4.11.0]", transitive_headers=True)
+        self.requires("libhal/[^4.12.0]", transitive_headers=True)
         self.requires("libhal-util/[^5.2.0]", transitive_headers=True)
 
     def package_info(self):
@@ -45,8 +45,5 @@ class libhal_mac_conan(ConanFile):
     def package_id(self):
         if self.info.options.get_safe("platform"):
             del self.info.options.platform
-
-        self.buildenv_info.define("LIBHAL_PLATFORM",
-                                  "mac")
-        self.buildenv_info.define("LIBHAL_PLATFORM_LIBRARY",
-                                  "mac")
+        self.buildenv_info.define("LIBHAL_PLATFORM", "mac")
+        self.buildenv_info.define("LIBHAL_PLATFORM_LIBRARY", "mac")
