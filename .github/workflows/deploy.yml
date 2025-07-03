@@ -76,10 +76,10 @@ jobs:
 
       - name: Set Version Environment Variable
         run: |
-          if [ -z "${{ inputs.version }}" ]; then
+          if [ -z "${{ github.ref_name }}" ]; then
             echo "VERSION=latest" >> $GITHUB_ENV
           else
-            echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
+            echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
           fi
 
       - name: 📦 Create `Debug` package for ${{ inputs.profile }}
@@ -113,5 +113,5 @@ jobs:
           JFROG_USER: ${{ secrets.JFROG_LIBHAL_TRUNK_ID_TOKEN_USER }}
         run: conan remote login -p $PASSWORD libhal $JFROG_USER
 
-      - name: 🆙 Upload package version ${{ inputs.version }} to `libhal` repo
-        run: conan upload "libhal-mac/${{ inputs.version }}" --confirm -r=libhal
+      - name: 🆙 Upload package version ${{ github.ref_name }} to `libhal` repo
+        run: conan upload "libhal-mac/${{ github.ref_name }}" --confirm -r=libhal
