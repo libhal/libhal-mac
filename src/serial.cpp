@@ -17,6 +17,7 @@
 #include <cerrno>
 #include <cstring>
 #include <fcntl.h>
+#include <libhal/output_pin.hpp>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <termios.h>
@@ -25,7 +26,7 @@
 #include <libhal/error.hpp>
 #include <libhal/pointers.hpp>
 
-namespace hal::mac {
+namespace hal::mac::inline v1 {
 
 namespace {
 /**
@@ -77,7 +78,7 @@ speed_t baud_rate_to_speed(hal::hertz p_baud_rate)
 }  // anonymous namespace
 
 hal::v5::strong_ptr<serial> serial::create(
-  std::pmr::polymorphic_allocator<hal::byte> p_allocator,
+  std::pmr::polymorphic_allocator<> p_allocator,
   std::string_view p_device_path,
   usize p_buffer_size,
   hal::v5::serial::settings const& p_settings)
@@ -90,12 +91,12 @@ hal::v5::strong_ptr<serial> serial::create(
     p_allocator, p_allocator, p_device_path, p_buffer_size, p_settings);
 }
 
-serial::serial(std::pmr::polymorphic_allocator<hal::byte> p_allocator,
+serial::serial(hal::v5::strong_ptr_only_token,
+               std::pmr::polymorphic_allocator<> p_allocator,
                std::string_view p_device_path,
                usize p_buffer_size,
                hal::v5::serial::settings const& p_settings)
-  : m_allocator(p_allocator)
-  , m_receive_buffer(p_buffer_size, hal::byte{ 0 }, p_allocator)
+  : m_receive_buffer(p_buffer_size, hal::byte{ 0 }, p_allocator)
 {
 
   // Open the serial device
@@ -126,7 +127,6 @@ serial::~serial()
   // Close the file descriptor
   if (m_fd != -1) {
     ::close(m_fd);
-    m_fd = -1;
   }
 }
 void serial::receive_thread_function()
@@ -334,4 +334,93 @@ void serial::set_control_signals(bool p_dtr_state, bool p_rts_state)
   }
 }
 
-}  // namespace hal::mac
+class modem_dtr_output_pin : public hal::output_pin
+{
+public:
+  modem_dtr_output_pin(hal::v5::strong_ptr_only_token,
+                       hal::v5::strong_ptr<mac::serial> p_manager)
+    : m_manager(p_manager)
+  {
+  }
+
+private:
+  void driver_configure(settings const& p_settings) override
+  {
+    if (p_settings.open_drain) {
+      hal::safe_throw(hal::operation_not_supported(this));
+    }
+    // we can ignore everything else as we do not have such control. The only
+    // thing we need to signal to the caller is that this operation is not
+    // possible. As such, the current sequence of execution cannot continue
+    // without intervention.
+  }
+
+  void driver_level(bool p_high) override
+  {
+    m_manager->set_dtr(p_high);
+  }
+
+  bool driver_level() override
+  {
+    return m_manager->get_control_signals().dtr;
+  }
+
+  hal::v5::strong_ptr<mac::serial> m_manager;
+};
+
+class modem_rts_output_pin : public hal::output_pin
+{
+public:
+  modem_rts_output_pin(hal::v5::strong_ptr_only_token,
+                       hal::v5::strong_ptr<mac::serial> p_manager)
+    : m_manager(p_manager)
+  {
+  }
+
+  modem_rts_output_pin(modem_rts_output_pin const&) = delete;
+  modem_rts_output_pin& operator=(modem_rts_output_pin const&) = delete;
+  modem_rts_output_pin(modem_rts_output_pin&&) = delete;
+  modem_rts_output_pin& operator=(modem_rts_output_pin&&) = delete;
+
+private:
+  void driver_configure(settings const& p_settings) override
+  {
+    if (p_settings.open_drain) {
+      hal::safe_throw(hal::operation_not_supported(this));
+    }
+    // we can ignore everything else as we do not have such control. The only
+    // thing we need to signal to the caller is that this operation is not
+    // possible. As such, the current sequence of execution cannot continue
+    // without intervention.
+  }
+
+  void driver_level(bool p_high) override
+  {
+    m_manager->set_rts(p_high);
+  }
+
+  bool driver_level() override
+  {
+    return m_manager->get_control_signals().rts;
+  }
+
+  hal::v5::strong_ptr<mac::serial> m_manager;
+};
+
+hal::v5::strong_ptr<hal::output_pin> acquire_output_pin(
+  std::pmr::polymorphic_allocator<> p_allocator,
+  hal::v5::strong_ptr<mac::serial> p_manager,
+  mac::modem_out p_pin)
+{
+  switch (p_pin) {
+    case mac::modem_out::dtr: {
+      return hal::v5::make_strong_ptr<modem_dtr_output_pin>(p_allocator,
+                                                            p_manager);
+    }
+    case mac::modem_out::rts: {
+      return hal::v5::make_strong_ptr<modem_rts_output_pin>(p_allocator,
+                                                            p_manager);
+    }
+  }
+}
+}  // namespace hal::mac::inline v1
