@@ -16,21 +16,21 @@ void application()
   std::println("Running hal::mac::serial application...");
   constexpr auto usb_serial_path = "/dev/tty.usbserial-59760081941";
   hal::v5::optional_ptr<hal::mac::serial> serial;
+  auto* heap_resource = std::pmr::new_delete_resource();
+
   try {
-    serial = hal::mac::serial::create(std::pmr::new_delete_resource(),
-                                      usb_serial_path,
-                                      1024,
-                                      { .baud_rate = 115200 });
+    serial = hal::mac::serial::create(
+      heap_resource, usb_serial_path, 1024, { .baud_rate = 115200 });
 
   } catch (hal::no_such_device const&) {
     std::println("The usb serial path {} was not found!", usb_serial_path);
     std::terminate();
   }
 
-  auto dtr = hal::acquire_output_pin(
-    std::pmr::new_delete_resource(), serial, hal::mac::modem_out::dtr);
-  auto rts = hal::acquire_output_pin(
-    std::pmr::new_delete_resource(), serial, hal::mac::modem_out::rts);
+  auto dtr =
+    hal::acquire_output_pin(heap_resource, serial, hal::mac::modem_out::dtr);
+  auto rts =
+    hal::acquire_output_pin(heap_resource, serial, hal::mac::modem_out::rts);
 
   // USB serial devices reset sequence:
   // Assert DTR and RTS
