@@ -65,8 +65,11 @@ jobs:
       - name: 👁️‍🗨️ Show conan profile (original)
         run: conan profile show
 
-      - name: 📡 Install default profiles
-        run: conan config install -sf ${{ matrix.profile_path }} -tf profiles https://github.com/libhal/libhal-mac.git
+      - name: 📡 Install default system profile for ${{ matrix.os }}
+        run: conan config install -sf ${{ matrix.profile_path }} https://github.com/libhal/conan-config.git
+
+      - name: 📡 Install libhal platform profiles for mac
+        run: conan config install -sf conan/profiles/v1 -tf profiles https://github.com/libhal/libhal-mac.git
 
       - name: 👁️‍🗨️ Show conan profile (new)
         run: conan profile show
