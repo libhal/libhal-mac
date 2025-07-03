@@ -116,5 +116,5 @@ jobs:
           JFROG_USER: ${{ secrets.JFROG_LIBHAL_TRUNK_ID_TOKEN_USER }}
         run: conan remote login -p $PASSWORD libhal $JFROG_USER
 
-      - name: 🆙 Upload package version ${{ github.ref_name }} to `libhal` repo
+      - name: 🆙 Upload package libhal-mac/${{ github.ref_name }} to remote
         run: conan upload "libhal-mac/${{ github.ref_name }}" --confirm -r=libhal
