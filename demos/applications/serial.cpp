@@ -1,26 +1,13 @@
-<<<<<<< HEAD
-#include <libhal/error.hpp>
-#include <thread>
-#include <unistd.h>
-
-=======
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 #include <memory_resource>
 #include <print>
 #include <span>
 #include <string_view>
-<<<<<<< HEAD
-=======
 #include <thread>
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 
 #include <libhal-mac/serial.hpp>
 #include <libhal-util/as_bytes.hpp>
 #include <libhal-util/serial.hpp>
-<<<<<<< HEAD
-=======
 #include <libhal/error.hpp>
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
 
 void application()
 {
@@ -29,10 +16,6 @@ void application()
   std::println("Running hal::mac::serial application...");
   constexpr auto usb_serial_path = "/dev/tty.usbserial-59760081941";
   hal::v5::optional_ptr<hal::mac::serial> serial;
-<<<<<<< HEAD
-=======
-
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
   try {
     serial = hal::mac::serial::create(std::pmr::new_delete_resource(),
                                       usb_serial_path,
