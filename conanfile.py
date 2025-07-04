@@ -42,6 +42,7 @@ class libhal_mac_conan(ConanFile):
         self.cpp_info.libs = ["libhal-mac"]
 
     def package_id(self):
+        self.info.python_requires.major_mode()
         if self.info.options.get_safe("platform"):
             del self.info.options.platform
         self.buildenv_info.define("LIBHAL_PLATFORM", "mac")
