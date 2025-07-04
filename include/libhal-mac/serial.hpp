@@ -111,12 +111,7 @@ public:
   /**
    * @brief Set the DTR (Data Terminal Ready) signal state
    *
-<<<<<<< HEAD
-   * @param p_state true to assert DTR (set high), false to deassert (set low)
-=======
-   * @param p_state true to assert DTR (set high), false to de-assert (set
-low)
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
+   * @param p_state true to assert DTR (set high), false to de-assert (set low)
    * @throws hal::operation_not_permitted if the operation fails
    */
   void set_dtr(bool p_state);
@@ -124,12 +119,7 @@ low)
   /**
    * @brief Set the RTS (Request To Send) signal state
    *
-<<<<<<< HEAD
-   * @param p_state true to assert RTS (set high), false to deassert (set low)
-=======
-   * @param p_state true to assert RTS (set high), false to de-assert (set
-low)
->>>>>>> 520fe79 (:tada: First commit w/ serial impl (#1))
+   * @param p_state true to assert RTS (set high), false to de-assert (set low)
    * @throws hal::operation_not_permitted if the operation fails
    */
   void set_rts(bool p_state);

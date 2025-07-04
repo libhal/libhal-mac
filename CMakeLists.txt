@@ -21,6 +21,8 @@ libhal_test_and_make_library(
 
   SOURCES
   src/serial.cpp
+  src/console.cpp
+  src/steady_clock.cpp
 
   TEST_SOURCES
   tests/main.test.cpp
