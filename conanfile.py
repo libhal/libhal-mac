@@ -35,7 +35,7 @@ class libhal_mac_conan(ConanFile):
     def requirements(self):
         # Replace with appropriate processor library
         self.requires("libhal/[^4.12.0]", transitive_headers=True)
-        self.requires("libhal-util/[^5.2.0]", transitive_headers=True)
+        self.requires("libhal-util/[^5.5.0]", transitive_headers=True)
 
     def package_info(self):
         self.cpp_info.set_property("cmake_target_name", "libhal::mac")
