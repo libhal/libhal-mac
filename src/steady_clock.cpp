@@ -27,7 +27,7 @@ steady_clock::steady_clock(hal::v5::strong_ptr_only_token)
 {
 }
 
-hal::v5::hertz steady_clock::driver_frequency()
+hertz steady_clock::driver_frequency()
 {
   // std::chrono::steady_clock frequency is represented by its period
   using period = std::chrono::steady_clock::period;

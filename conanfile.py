@@ -32,6 +32,11 @@ class libhal_mac_conan(ConanFile):
     python_requires = "libhal-bootstrap/[>=4.4.0 <5]"
     python_requires_extend = "libhal-bootstrap.library"
 
+    def set_version(self):
+        # Use latest if not specified via command line
+        if not self.version:
+            self.version = "latest"
+
     def requirements(self):
         # Replace with appropriate processor library
         self.requires("libhal/[^4.12.0]", transitive_headers=True)
@@ -40,10 +45,10 @@ class libhal_mac_conan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_target_name", "libhal::mac")
         self.cpp_info.libs = ["libhal-mac"]
+        self.buildenv_info.define("LIBHAL_PLATFORM", "mac")
+        self.buildenv_info.define("LIBHAL_PLATFORM_LIBRARY", "mac")
 
     def package_id(self):
         self.info.python_requires.major_mode()
         if self.info.options.get_safe("platform"):
             del self.info.options.platform
-        self.buildenv_info.define("LIBHAL_PLATFORM", "mac")
-        self.buildenv_info.define("LIBHAL_PLATFORM_LIBRARY", "mac")

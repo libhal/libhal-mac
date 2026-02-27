@@ -19,40 +19,29 @@ Following the
 [🚀 Getting Started](https://libhal.github.io/latest/getting_started/)
 instructions.
 
-## 📡 Installing Profiles
-
-> [!INFO]
-> Make sure you have installed the default conan profile for your mac OS before
-> proceeding.
-
-Profiles define which platform you mean to build your project against. These
-profiles are needed by the conan files to determine which files to build for demos and for libraries. In order to build binaries using libhal for the mac OS, run the following command.
-
-```bash
-conan config install -sf conan/profiles/v1 -tf profiles https://github.com/libhal/libhal-mac.git
-```
-
-The `mac-hal` profile will be added to your conan `profiles` directory. Now
-that you have that installed, you can build demos and libraries.
-
 ## 🏗️ Building Demos
+
+All applications must be built on a mac to get a suitable binary.
 
 To build demos, start at the root of the repo and execute the following command:
 
 ```bash
-conan build demos -pr mac-hal
+conan build demos -pr:a hal/tc/llvm
 ```
+
+> [!NOTE]
+> GCC is not currently supported.
 
 If you'd like to make a minimum sized binary or a debug binary use the following commands:
 
 ```bash
 # For minimum sized binaries (optimized for small code size)
-conan build demos -pr mac-hal -s build_type=MinSizeRel
+conan build demos -pr:a hal/tc/llvm -s build_type=MinSizeRel
 ```
 
 ```bash
 # For debug binaries (low optimization)
-conan build demos -pr mac-hal -s build_type=Debug
+conan build demos -pr:a hal/tc/llvm -s build_type=Debug
 ```
 
 We default to `Release` builds when building for Mac OSX.
