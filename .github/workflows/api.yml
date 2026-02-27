@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # Copyright 2024 - 2025 Khalil Estell and the libhal contributors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from conan import ConanFile
+name: 📚 Deploy APIs
 
+on:
+  release:
+    types:
+      - published
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-class demos(ConanFile):
-    python_requires = "libhal-bootstrap/[>=4.4.0 <5]"
-    python_requires_extend = "libhal-bootstrap.demo"
+permissions:
+  contents: write
 
-    def requirements(self):
-        self.requires("libhal-mac/latest")
+jobs:
+  api:
+    uses: libhal/ci/.github/workflows/api_docs_gen.yml@5.x.y
+    secrets: inherit

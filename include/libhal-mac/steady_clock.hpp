@@ -35,8 +35,8 @@ namespace hal::mac::inline v1 {
  * frequency is derived from std::chrono::steady_clock's period.
  */
 class steady_clock
-  : public hal::v5::steady_clock
-  , public hal::v5::enable_strong_from_this<steady_clock>
+  : public hal::steady_clock
+  , public hal::enable_strong_from_this<steady_clock>
 {
 public:
   /**
@@ -54,7 +54,7 @@ public:
   steady_clock(hal::v5::strong_ptr_only_token);
 
 private:
-  hal::v5::hertz driver_frequency() override;
+  hal::hertz driver_frequency() override;
   hal::u64 driver_uptime() override;
 
   /// Reference time point from construction for uptime calculations
