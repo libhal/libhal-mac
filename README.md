@@ -23,7 +23,16 @@ instructions.
 
 All applications must be built on a mac to get a suitable binary.
 
-To build demos, start at the root of the repo and execute the following command:
+The demos use the `latest` version of the `libhal-mac` package to work. Before you can build the demos you need to create the `latest` package:
+
+```bash
+conan create . -pr:a hal/tc/llvm
+```
+
+> [!NOTE]
+> By not specifying a `--version`, the version `latest` is choosen.
+
+Now you can build demos by running the following command:
 
 ```bash
 conan build demos -pr:a hal/tc/llvm
